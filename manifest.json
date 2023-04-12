@@ -1,0 +1,20 @@
+{
+  "id": "chu610234940.obsidian-Quick-insert-map",
+  "name": "Quick Insert Map",
+  "version": "0.1.0",
+  "description": "A plugin for quickly inserting map locations into Obsidian using the AMap API",
+  "author": "永远",
+  "homepage": "https://github.com/chu610234940/obsidian-Quick-insert-map",
+  "repository": "https://github.com/chu610234940/obsidian-Quick-insert-map",
+  "dependencies": {},
+  "optionalDependencies": {},
+  "devDependencies": {},
+  "scripts": {},
+  "main": "main.js",
+  "entry": "src/index.js",
+  "minimumObsidianVersion": "0.12.0",
+  "compatibleVersions": {
+    "0.12.0": "0.1.0"
+  },
+  "category": "other"
+}
