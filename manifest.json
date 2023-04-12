@@ -1,23 +1,19 @@
 {
-  "id": "obsidian-Quick-insert-map",
+  "id": "obsidian-quick-insert-map",
   "name": "Quick Insert Map",
   "version": "0.2.0",
-  "description": "A plugin to quickly insert a map into your note",
   "author": "Your Name",
-  "minAppVersion": "0.12.12",
-  "plugin-commands": [
-    {
-      "id": "insert-map",
-      "name": "Insert Map"
-    }
-  ],
-  "settings": [
-    {
-      "id": "apiKey",
-      "name": "API Key",
-      "description": "Enter your API Key for the map service",
-      "default": "",
-      "type": "text"
-    }
-  ]
+  "description": "A plugin for quickly inserting maps with AMap API.",
+  "tags": ["map", "location"],
+  "main": "main.js",
+  "icon": "icon.png",
+  "api": "0.10.1",
+  "settings": [{
+    "tab": "API Key",
+    "id": "api-key",
+    "name": "AMap API Key",
+    "desc": "Enter your AMap API Key here",
+    "default": "",
+    "type": "text"
+  }]
 }
