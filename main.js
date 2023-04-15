@@ -1,3 +1,26 @@
+console.log("Quick insert map plugin is activated");
+import { MapView } from "./main";
+
+import { Plugin } from 'obsidian';
+
+export default class QuickInsertMapPlugin extends Plugin {
+  async onload() {
+    console.log('loading Quick insert map plugin');
+    this.addCommand({
+      id: 'insert-map',
+      name: 'Insert Map',
+      callback: () => {
+        const view = new MapView(this.app, this);
+        view.open();
+      },
+    });
+  }
+
+  onunload() {
+    console.log('unloading Quick insert map plugin');
+  }
+}
+
 import { Plugin } from 'obsidian';
 import { MapView } from "./main";
 
