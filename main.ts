@@ -1,126 +1,63 @@
-import {
-  App, 
-  Modal, 
-  Notice,
-  Plugin,
-  PluginSettingTab,
-  Setting,
-  TFile,
-  WorkspaceLeaf,
-  MarkdownView,
-  MarkdownPostProcessorContext
-} from 'obsidian';
+import { Plugin } from 'obsidian';
+import axios from 'axios';
 
-interface MyPluginSettings {
-  mySetting: string;
-}
-
-const DEFAULT_SETTINGS: MyPluginSettings = {
-  mySetting: 'default'
-}
-
-export default class MyPlugin extends Plugin {
-  settings: MyPluginSettings;
-
+export default class QuickInsertMapPlugin extends Plugin {
   async onload() {
-    console.log('Loading plugin');
-
-    await this.loadSettings();
+    console.log('loading plugin');
 
     this.addCommand({
-      id: 'insert-map',
+      id: 'quick-insert-map',
       name: 'Insert Map',
-      callback: this.insertMap
-    });
+      callback: async () => {
+        const selectedText = this.app.workspace.activeLeaf.view.sourceMode.cmEditor.getSelection();
+        if (selectedText) return;
 
-    this.addSettingTab(new MyPluginSettingsTab(this.app, this));
+        const editor = this.app.workspace.activeLeaf.view.editor;
+        const cursor = editor.getCursor();
+        const line = editor.getLine(cursor.line);
 
-    console.log('Plugin loaded');
-  }
+        const location = await this.getLocationFromApi();
 
-  async onunload() {
-    console.log('Unloading plugin');
+        const mapText = `![[${location.address}#${location.lng},${location.lat}]]`;
 
-    console.log('Plugin unloaded');
-  }
-
-  async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-  }
-
-  async saveSettings() {
-    await this.saveData(this.settings);
-  }
-
-  async insertMap() {
-    const leaf = this.app.workspace.activeLeaf;
-    const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-
-    if (!leaf || !view) {
-      new Notice('No markdown view available');
-      return;
-    }
-
-    const editor = view.sourceMode.cmEditor;
-
-    const cursor = editor.getCursor();
-    const line = editor.getLine(cursor.line);
-    const match = line.match(/^\s*-\s+(\[\[.*\]\])/);
-
-    if (!match) {
-      new Notice('No link under cursor');
-      return;
-    }
-
-    const [, link] = match;
-
-    const file = this.app.metadataCache.getFirstLinkpathDest(link, this.app.workspace.getActiveFile().path);
-
-    if (!file) {
-      new Notice('Link target not found');
-      return;
-    }
-
-    const map = await this.createMap(file);
-
-    editor.replaceRange(`\n\n<div class="map">\n\n${map}\n\n</div>\n\n`, {
-      line: cursor.line + 1,
-      ch: 0
+        editor.replaceRange(mapText, cursor);
+      },
     });
   }
 
-  async createMap(file: TFile): Promise<string> {
-    const mapUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+555555(${encodeURIComponent(`${file.name}`)})/${encodeURIComponent(`${file.dir}/${file.name}`)},${encodeURIComponent(`${file.name}`)}/500x300?access_token=${this.settings.mySetting}`;
+  async getLocationFromApi() {
+    try {
+      const response = await axios.get('https://restapi.amap.com/v3/ip', {
+        params: {
+          key: 'your_amap_key_here',
+        },
+      });
 
-    return `![${file.name}](${mapUrl})`;
+      const location = response.data?.adcode;
+      if (!location) throw new Error('Failed to get location from API');
+
+      const geoResponse = await axios.get('https://restapi.amap.com/v3/geocode/regeo', {
+        params: {
+          key: 'your_amap_key_here',
+          location: location,
+          extensions: 'all',
+        },
+      });
+
+      const address = geoResponse.data?.regeocode?.formatted_address;
+      const lng = geoResponse.data?.regeocode?.addressComponent?.streetNumber?.location?.split(',')[0];
+      const lat = geoResponse.data?.regeocode?.addressComponent?.streetNumber?.location?.split(',')[1];
+
+      if (!address || !lng || !lat) throw new Error('Failed to get location information from API');
+
+      return { address, lng, lat };
+    } catch (error) {
+      console.error(error);
+      throw new Error('Failed to get location information from API');
+    }
   }
-}
 
-class MyPluginSettingsTab extends PluginSettingTab {
-  plugin: MyPlugin;
-
-  constructor(app: App, plugin: MyPlugin) {
-    super(app, plugin);
-    this.plugin = plugin;
-  }
-
-  display(): void {
-    let {containerEl} = this;
-
-    containerEl.empty();
-
-    containerEl.createEl('h2', {text: 'Settings for Quick Insert Map'});
-
-    new Setting(containerEl)
-      .setName('Mapbox Access Token')
-      .setDesc('Enter your Mapbox access token. Get one at https://account.mapbox.com/access-tokens/')
-      .addText(text => text
-        .setPlaceholder('Enter access token')
-        .setValue(this.plugin.settings.mySetting)
-        .onChange(async (value) => {
-          this.plugin.settings.mySetting = value;
-          await this.plugin.saveSettings();
-        }));
-
+  onunload() {
+    console.log('unloading plugin');
   }
 }
