@@ -1,19 +1,27 @@
 {
   "id": "obsidian-quick-insert-map",
   "name": "Quick Insert Map",
-  "version": "0.2.0",
-  "author": "Your Name",
-  "description": "A plugin for quickly inserting maps with AMap API.",
-  "tags": ["map", "location"],
-  "main": "main.js",
+  "version": "0.0.1",
+  "description": "Insert map into Obsidian notes quickly",
+  "author": "Chu Yeow <chuyeow@gmail.com>",
+  "tags": [
+    "map",
+    "location"
+  ],
+  "minAppVersion": "0.11.0",
+  "dependencies": [],
+  "permissions": [
+    "file-access",
+    "http"
+  ],
   "icon": "icon.png",
-  "api": "0.10.1",
-  "settings": [{
-    "tab": "API Key",
-    "id": "api-key",
-    "name": "AMap API Key",
-    "desc": "Enter your AMap API Key here",
-    "default": "",
-    "type": "text"
-  }]
+  "entry": "main.js",
+  "settings": {
+    "apiKey": {
+      "title": "高德地图 API Key",
+      "description": "请填写您申请的高德地图 API Key。",
+      "type": "string",
+      "default": ""
+    }
+  }
 }
