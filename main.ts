@@ -1,5 +1,5 @@
-import * as obsidian from 'obsidian';
-import * as L from 'leaflet';
+import { App, Plugin, PluginSettingTab, Setting, MarkdownView } from 'obsidian';
+import { MapView } from './main';
 
 class MapView extends obsidian.VueComponent {
     leafletMap: L.Map;
@@ -24,16 +24,19 @@ export default class MyPlugin extends obsidian.Plugin {
         console.log('loading Quick insert map plugin');
 
         this.addCommand({
-            id: 'open-quick-insert-map',
-            name: 'Quick insert map',
-            callback: () => {
-                let activeLeaf = this.app.workspace.activeLeaf;
-                if (activeLeaf) {
-                    let containerEl = activeLeaf.view.containerEl;
-                    let map = new MapView(this.app, containerEl);
-                }
-            },
-        });
+    id: 'insert-map',
+    name: 'Insert Map',
+    callback: () => {
+        this.insertMapView();
+    },
+    hotkeys: [
+        {
+            modifiers: ['Mod'],
+            key: 'm',
+        },
+    ],
+});
+
     }
 
     onunload() {
