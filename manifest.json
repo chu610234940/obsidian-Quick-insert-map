@@ -1,0 +1,19 @@
+{
+  "id": "obsidian-quick-insert-map",
+  "name": "Quick Insert Map",
+  "version": "0.2.0",
+  "author": "Your Name",
+  "description": "A plugin for quickly inserting maps with AMap API.",
+  "tags": ["map", "location"],
+  "main": "main.js",
+  "icon": "icon.png",
+  "api": "0.10.1",
+  "settings": [{
+    "tab": "API Key",
+    "id": "api-key",
+    "name": "AMap API Key",
+    "desc": "Enter your AMap API Key here",
+    "default": "",
+    "type": "text"
+  }]
+}
