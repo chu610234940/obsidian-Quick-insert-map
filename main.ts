@@ -1,81 +1,42 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
-import L from 'leaflet';
-import { QuickInsertMapSettings } from './settings';
+import * as obsidian from 'obsidian';
+import * as L from 'leaflet';
 
-export default class QuickInsertMapPlugin extends Plugin {
-  settings: QuickInsertMapSettings;
+class MapView extends obsidian.VueComponent {
+    leafletMap: L.Map;
 
-  async onload() {
-    console.log('loading plugin');
+    constructor(app: obsidian.App, private containerEl: HTMLElement) {
+        super(app);
 
-    // Load saved settings
-    this.settings = Object.assign(new QuickInsertMapSettings(), await this.loadSettings());
-
-    // Add a settings tab
-    this.addSettingTab(new QuickInsertMapSettingTab(this.app, this));
-
-    // Register the command to insert map
-    this.addCommand({
-      id: 'insert-map',
-      name: 'Insert Map',
-      callback: () => this.insertMap(),
-    });
-  }
-
-  onunload() {
-    console.log('unloading plugin');
-
-    // Save current settings
-    this.saveSettings(this.settings);
-  }
-
-  async insertMap() {
-    // Get current editor
-    const editor = this.app.workspace.getActiveTextEditor();
-
-    if (editor) {
-      // Create a new div element
-      const div = document.createElement('div');
-      div.style.width = '100%';
-      div.style.height = '400px';
-      editor.el.appendChild(div);
-
-      // Create a new map instance
-      const map = L.map(div).setView([0, 0], 13);
-
-      // Add a tile layer
-      const url = `https://restapi.amap.com/v3/staticmap?key=${this.settings.apiKey}&location=0,0&zoom=13&size=400*400&markers=mid,,0:0`;
-      const layer = L.tileLayer(url);
-      map.addLayer(layer);
+        const mapEl = this.containerEl.createEl('div', { cls: 'my-plugin-map' });
+        this.leafletMap = L.map(mapEl).setView([51.505, -0.09], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+        }).addTo(this.leafletMap);
     }
-  }
+
+    getMapView(): HTMLElement {
+        return this.containerEl;
+    }
 }
 
-class QuickInsertMapSettingTab extends PluginSettingTab {
-  plugin: QuickInsertMapPlugin;
+export default class MyPlugin extends obsidian.Plugin {
+    async onload() {
+        console.log('loading Quick insert map plugin');
 
-  constructor(app: App, plugin: QuickInsertMapPlugin) {
-    super(app, plugin);
-    this.plugin = plugin;
-  }
+        this.addCommand({
+            id: 'open-quick-insert-map',
+            name: 'Quick insert map',
+            callback: () => {
+                let activeLeaf = this.app.workspace.activeLeaf;
+                if (activeLeaf) {
+                    let containerEl = activeLeaf.view.containerEl;
+                    let map = new MapView(this.app, containerEl);
+                }
+            },
+        });
+    }
 
-  display(): void {
-    let { containerEl } = this;
-
-    containerEl.empty();
-    containerEl.createEl('h2', { text: 'Quick Insert Map Settings' });
-
-    new Setting(containerEl)
-      .setName('高德地图 API Key')
-      .setDesc('请填写您申请的高德地图 API Key。')
-      .addText((text) =>
-        text
-          .setPlaceholder('请输入 API Key')
-          .setValue(this.plugin.settings.apiKey)
-          .onChange(async (value) => {
-            this.plugin.settings.apiKey = value;
-            await this.plugin.saveSettings();
-          })
-      );
-  }
+    onunload() {
+        console.log('unloading Quick insert map plugin');
+    }
 }
