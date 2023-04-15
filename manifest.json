@@ -23,5 +23,6 @@
       "type": "string",
       "default": ""
     }
-  }
+  },
+ "permissions": ["settings:read", "settings:write"]
 }
