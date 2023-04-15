@@ -1,3 +1,8 @@
+import { Plugin } from 'obsidian';
+import { MapView } from "./main";
+
+export default class MyPlugin extends Plugin {
+
 // Import the necessary classes and interfaces from the Obsidian API
 import { Plugin } from 'obsidian';
 import type { App, TFile } from 'obsidian';
@@ -226,4 +231,5 @@ class MapView extends React.Component {
       </div>
     );
   }
+}
 }
