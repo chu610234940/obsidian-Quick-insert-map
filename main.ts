@@ -7,7 +7,7 @@ export default class QuickInsertMapPlugin extends Plugin {
 
     this.addCommand({
       id: 'quick-insert-map',
-      name: 'Insert Map',
+      name: 'Quick Insert Map',
       callback: async () => {
         const selectedText = this.app.workspace.activeLeaf.view.sourceMode.cmEditor.getSelection();
         if (selectedText) return;
