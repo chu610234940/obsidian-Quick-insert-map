@@ -1,0 +1,12 @@
+{
+  "id": "obsidian-insert-map",
+  "name": "Obsidian Insert Map",
+  "version": "0.1.0",
+  "author": "星琪",
+  "description": "一个使用 Google Maps API 插入地图的 Obsidian 插件.",
+  "minAppVersion": "0.9.0",
+  "authorUrl": "https://github.com/chu610234940/obsidian-insert-map",
+  "js": "main.js"
+}
+
+
